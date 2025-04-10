@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Inventory Management{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Products</h5>
+                <h2>{{ total_products }}</h2>
+                <a href="{% url 'product_list' %}" class="text-white">View all products →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Categories</h5>
+                <h2>{{ total_categories }}</h2>
+                <a href="{% url 'category_list' %}" class="text-white">View all categories →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Low Stock Items</h5>
+                <h2>{{ low_stock_products }}</h2>
+                <a href="{% url 'product_list' %}?low_stock=1" class="text-white">View low stock →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Inventory Value</h5>
+                <h2>${{ total_value|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Products</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for product in recent_products %}
+                    <a href="{% url 'product_detail' product.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ product.name }}</h6>
+                            <small>{{ product.created_at|date }}</small>
+                        </div>
+                        <p class="mb-1">Qty: {{ product.quantity }} | ${{ product.price }}</p>
+                    </a>
+                    {% empty %}
+                    <p class="text-muted">No products added yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Categories Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for category in categories_with_counts %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ category.name }}</h6>
+                            <span class="badge bg-primary rounded-pill">{{ category.product_count }}</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No categories added yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
