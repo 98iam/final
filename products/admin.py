@@ -4,22 +4,23 @@ from .models import Category, Product
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'product_count', 'created_at')
+    list_display = ('name', 'description', 'product_count', 'created_at', 'user')
+    list_filter = ('user',)
     search_fields = ('name', 'description')
-    
+
     def product_count(self, obj):
         return obj.products.count()
     product_count.short_description = 'Number of Products'
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sku', 'category', 'price', 'quantity_status', 'status')
-    list_filter = ('category', 'status', 'created_at')
+    list_display = ('name', 'sku', 'category', 'price', 'quantity_status', 'status', 'user')
+    list_filter = ('category', 'status', 'created_at', 'user')
     search_fields = ('name', 'sku', 'description', 'supplier')
     readonly_fields = ('created_at', 'updated_at')  # Remove profit_margin from readonly_fields
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'description', 'category', 'status')
+            'fields': ('name', 'description', 'category', 'status', 'user')
         }),
         ('Product Details', {
             'fields': ('sku', 'barcode', 'supplier', 'location')

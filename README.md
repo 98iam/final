@@ -8,7 +8,8 @@ A Django-based inventory management system that helps track products, categories
 - Category organization
 - Stock level tracking with status indicators
 - Admin interface for easy management
-- Secure authentication system
+- Secure authentication system with Supabase integration
+- Multi-user support with data isolation
 
 ## Tech Stack
 
@@ -22,8 +23,8 @@ A Django-based inventory management system that helps track products, categories
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/98iam/django.git
-cd django
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
 ```
 
 2. Create a virtual environment:
@@ -37,28 +38,18 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Create a `.env` file in the root directory with your database credentials:
-```
-SECRET_KEY=your_secret_key
-DB_NAME=your_db_name
-DB_USER=your_db_user
-DB_PASSWORD=your_db_password
-DB_HOST=your_db_host
-DB_PORT=5432
-```
-
-5. Run migrations:
+4. Run migrations:
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-6. Create a superuser:
+5. Create a superuser:
 ```bash
 python manage.py createsuperuser
 ```
 
-7. Run the development server:
+6. Run the development server:
 ```bash
 python manage.py runserver
 ```
@@ -66,7 +57,7 @@ python manage.py runserver
 ## Usage
 
 1. Access the admin interface at `http://localhost:8000/admin`
-2. Log in with your superuser credentials
+2. Log in with your credentials
 3. Start managing your inventory!
 
 ## Contributing
