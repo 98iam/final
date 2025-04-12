@@ -1,0 +1,90 @@
+{% extends 'auth/settings/base_settings.html' %}
+
+{% block settings_content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Appearance Settings</h5>
+    </div>
+    <div class="card-body">
+        <div class="mb-4">
+            <h6>Theme</h6>
+            <p class="text-muted">Choose between light and dark mode for the application interface.</p>
+            
+            <div class="d-flex gap-3 mt-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="theme" id="themeLight" value="light" {% if preference.theme == 'light' %}checked{% endif %}>
+                    <label class="form-check-label" for="themeLight">
+                        Light Mode
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="theme" id="themeDark" value="dark" {% if preference.theme == 'dark' %}checked{% endif %}>
+                    <label class="form-check-label" for="themeDark">
+                        Dark Mode
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <div id="saveStatus" class="text-success" style="display: none;">
+                <i class="fas fa-check-circle"></i> Settings saved
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle theme change
+        const themeRadios = document.querySelectorAll('input[name="theme"]');
+        themeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                saveAppearanceSettings();
+            });
+        });
+        
+        // Function to save appearance settings
+        function saveAppearanceSettings() {
+            const theme = document.querySelector('input[name="theme"]:checked').value;
+            
+            fetch('{% url "save_appearance_settings" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    theme: theme
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSaveStatus();
+                    // Apply theme change immediately
+                    document.documentElement.setAttribute('data-bs-theme', theme);
+                } else {
+                    alert('Error saving settings: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving settings');
+            });
+        }
+        
+        // Function to show save status
+        function showSaveStatus() {
+            const saveStatus = document.getElementById('saveStatus');
+            saveStatus.style.display = 'block';
+            
+            setTimeout(() => {
+                saveStatus.style.display = 'none';
+            }, 2000);
+        }
+    });
+</script>
+{% endblock %}

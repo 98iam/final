@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - Inventory Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Settings</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'settings_profile' %}" class="list-group-item list-group-item-action {% if active_tab == 'profile' %}active{% endif %}">
+                    <i class="fas fa-user me-2"></i> Profile
+                </a>
+                <a href="{% url 'settings_appearance' %}" class="list-group-item list-group-item-action {% if active_tab == 'appearance' %}active{% endif %}">
+                    <i class="fas fa-palette me-2"></i> Appearance
+                </a>
+                <a href="{% url 'settings_notifications' %}" class="list-group-item list-group-item-action {% if active_tab == 'notifications' %}active{% endif %}">
+                    <i class="fas fa-bell me-2"></i> Notifications
+                </a>
+                <a href="{% url 'settings_security' %}" class="list-group-item list-group-item-action {% if active_tab == 'security' %}active{% endif %}">
+                    <i class="fas fa-lock me-2"></i> Security
+                </a>
+                <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block settings_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

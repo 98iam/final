@@ -87,6 +87,9 @@ The system includes comprehensive analytics capabilities:
 - **User-specific Data**: Each user sees only their own inventory and analytics data
 - **Dashboard Customization**: Drag-and-drop interface to reorder and toggle dashboard widgets
 - **Personalized Settings**: User preferences are saved and applied across sessions
+- **User Profile Management**: Update personal information, profile picture, and account preferences
+- **Notification Preferences**: Configure email notifications for low stock alerts and order updates
+- **Security Settings**: Change password and manage account security
 
 ## License
 

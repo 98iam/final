@@ -46,16 +46,20 @@
                             <li><a class="dropdown-item" href="{% url 'custom_reports' %}">Custom Reports</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <span class="nav-link">Welcome, {{ user.username }}</span>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{% url 'settings_profile' %}"><i class="fas fa-cog me-2"></i> Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn-toggle-theme" id="themeToggle" title="Toggle Dark/Light Mode">
                             <i class="fas {% if request.theme == 'dark' %}fa-sun{% else %}fa-moon{% endif %}"></i>
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
