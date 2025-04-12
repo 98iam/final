@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+from django.utils import timezone
+import uuid
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -65,3 +67,97 @@ class Product(models.Model):
         except (TypeError, ZeroDivisionError):
             return 0
 
+class Sale(models.Model):
+    PAYMENT_METHODS = [
+        ('cash', 'Cash'),
+        ('credit_card', 'Credit Card'),
+        ('bank_transfer', 'Bank Transfer'),
+        ('other', 'Other'),
+    ]
+
+    STATUS_CHOICES = [
+        ('completed', 'Completed'),
+        ('pending', 'Pending'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    invoice_number = models.CharField(max_length=50, unique=True, default=uuid.uuid4)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sales')
+    customer_name = models.CharField(max_length=200, blank=True, null=True)
+    customer_email = models.EmailField(blank=True, null=True)
+    sale_date = models.DateTimeField(default=timezone.now)
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='cash')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='completed')
+    notes = models.TextField(blank=True, null=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Sale #{self.invoice_number}"
+
+    def save(self, *args, **kwargs):
+        # Calculate total amount from sale items if not set
+        if not self.total_amount:
+            self.total_amount = sum(item.subtotal for item in self.items.all())
+        super().save(*args, **kwargs)
+
+class SaleItem(models.Model):
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sale_items')
+    quantity = models.PositiveIntegerField(default=1)
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # Price at time of sale
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+    @property
+    def subtotal(self):
+        return self.quantity * self.price
+
+class InventorySnapshot(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='inventory_snapshots')
+    date = models.DateField(default=timezone.now)
+    total_value = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_products = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'date']
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"Inventory Snapshot {self.date}"
+
+class SavedReport(models.Model):
+    REPORT_TYPES = [
+        ('sales', 'Sales Report'),
+        ('inventory', 'Inventory Report'),
+        ('product', 'Product Performance'),
+        ('custom', 'Custom Report'),
+    ]
+
+    name = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_reports')
+    report_type = models.CharField(max_length=20, choices=REPORT_TYPES)
+    configuration = models.JSONField(default=dict)  # Stores report configuration as JSON
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+class UserPreference(models.Model):
+    THEME_CHOICES = [
+        ('light', 'Light'),
+        ('dark', 'Dark'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='preferences')
+    theme = models.CharField(max_length=10, choices=THEME_CHOICES, default='light')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s preferences"

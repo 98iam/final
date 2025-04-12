@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+
+{% block title %}Custom Reports - Analytics{% endblock %}
+
+{% block content %}
+<div class="analytics-section">
+    <h2>Custom Reports</h2>
+    <p class="text-muted">Create and save custom reports for your inventory data</p>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Report Builder</h5>
+                </div>
+                <div class="card-body">
+                    <form id="reportForm">
+                        <div class="mb-3">
+                            <label for="reportName" class="form-label">Report Name</label>
+                            <input type="text" class="form-control" id="reportName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reportType" class="form-label">Report Type</label>
+                            <select class="form-select" id="reportType" required>
+                                {% for value, label in report_types %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fields to Include</label>
+                            <div class="report-fields">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="product_name" id="field_product_name" checked>
+                                    <label class="form-check-label" for="field_product_name">
+                                        Product Name
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="category" id="field_category" checked>
+                                    <label class="form-check-label" for="field_category">
+                                        Category
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="quantity" id="field_quantity" checked>
+                                    <label class="form-check-label" for="field_quantity">
+                                        Quantity
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="price" id="field_price" checked>
+                                    <label class="form-check-label" for="field_price">
+                                        Price
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="cost" id="field_cost">
+                                    <label class="form-check-label" for="field_cost">
+                                        Cost
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="profit_margin" id="field_profit_margin">
+                                    <label class="form-check-label" for="field_profit_margin">
+                                        Profit Margin
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="status" id="field_status">
+                                    <label class="form-check-label" for="field_status">
+                                        Status
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Filters</label>
+                            <div class="mb-2">
+                                <select class="form-select form-select-sm" id="filterField">
+                                    <option value="category">Category</option>
+                                    <option value="status">Status</option>
+                                    <option value="quantity">Quantity</option>
+                                    <option value="price">Price</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <select class="form-select form-select-sm" id="filterOperator">
+                                    <option value="equals">Equals</option>
+                                    <option value="contains">Contains</option>
+                                    <option value="greater_than">Greater Than</option>
+                                    <option value="less_than">Less Than</option>
+                                </select>
+                            </div>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control form-control-sm" id="filterValue" placeholder="Filter value">
+                                <button class="btn btn-sm btn-outline-secondary" type="button" id="addFilterBtn">Add</button>
+                            </div>
+                            <div id="activeFilters" class="mt-2">
+                                <!-- Active filters will be added here -->
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Report</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Report Preview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="report-preview">
+                        <p class="text-center text-muted">Configure your report to see a preview</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Saved Reports</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Created</th>
+                                    <th>Last Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in saved_reports %}
+                                <tr>
+                                    <td>{{ report.name }}</td>
+                                    <td>{{ report.get_report_type_display }}</td>
+                                    <td>{{ report.created_at|date:"M d, Y" }}</td>
+                                    <td>{{ report.updated_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary load-report" data-report-id="{{ report.id }}" data-report-config="{{ report.configuration|safe }}">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-report" data-report-id="{{ report.id }}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No saved reports yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const reportForm = document.getElementById('reportForm');
+        const activeFilters = document.getElementById('activeFilters');
+        const addFilterBtn = document.getElementById('addFilterBtn');
+        
+        // Add filter
+        addFilterBtn.addEventListener('click', function() {
+            const field = document.getElementById('filterField').value;
+            const operator = document.getElementById('filterOperator').value;
+            const value = document.getElementById('filterValue').value;
+            
+            if (!value) return;
+            
+            const filterDiv = document.createElement('div');
+            filterDiv.className = 'alert alert-secondary d-flex justify-content-between align-items-center py-1 px-2 mb-1';
+            filterDiv.innerHTML = `
+                <span>${field} ${operator.replace('_', ' ')} ${value}</span>
+                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+            `;
+            
+            // Add data attributes for saving
+            filterDiv.dataset.field = field;
+            filterDiv.dataset.operator = operator;
+            filterDiv.dataset.value = value;
+            
+            // Add remove button functionality
+            filterDiv.querySelector('.btn-close').addEventListener('click', function() {
+                filterDiv.remove();
+                updatePreview();
+            });
+            
+            activeFilters.appendChild(filterDiv);
+            document.getElementById('filterValue').value = '';
+            
+            updatePreview();
+        });
+        
+        // Save report
+        reportForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('reportName').value;
+            const reportType = document.getElementById('reportType').value;
+            
+            // Get selected fields
+            const fields = [];
+            document.querySelectorAll('.report-fields input:checked').forEach(checkbox => {
+                fields.push(checkbox.value);
+            });
+            
+            // Get filters
+            const filters = [];
+            document.querySelectorAll('#activeFilters > div').forEach(filterDiv => {
+                filters.push({
+                    field: filterDiv.dataset.field,
+                    operator: filterDiv.dataset.operator,
+                    value: filterDiv.dataset.value
+                });
+            });
+            
+            // Create configuration object
+            const configuration = {
+                fields: fields,
+                filters: filters
+            };
+            
+            // Save report via AJAX
+            fetch('{% url "save_report" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    report_type: reportType,
+                    configuration: configuration
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload page to show updated reports list
+                    window.location.reload();
+                } else {
+                    alert('Error saving report: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the report');
+            });
+        });
+        
+        // Update preview when fields change
+        document.querySelectorAll('.report-fields input').forEach(checkbox => {
+            checkbox.addEventListener('change', updatePreview);
+        });
+        
+        // Function to update preview
+        function updatePreview() {
+            const previewDiv = document.querySelector('.report-preview');
+            const selectedFields = [];
+            
+            document.querySelectorAll('.report-fields input:checked').forEach(checkbox => {
+                selectedFields.push(checkbox.value);
+            });
+            
+            if (selectedFields.length === 0) {
+                previewDiv.innerHTML = '<p class="text-center text-muted">Select at least one field to see a preview</p>';
+                return;
+            }
+            
+            // Create table header
+            let tableHTML = '<div class="table-responsive"><table class="table"><thead><tr>';
+            selectedFields.forEach(field => {
+                tableHTML += `<th>${field.replace('_', ' ').charAt(0).toUpperCase() + field.replace('_', ' ').slice(1)}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+            
+            // Add sample data rows
+            for (let i = 0; i < 3; i++) {
+                tableHTML += '<tr>';
+                selectedFields.forEach(field => {
+                    if (field === 'product_name') {
+                        tableHTML += `<td>Sample Product ${i+1}</td>`;
+                    } else if (field === 'category') {
+                        tableHTML += `<td>Category ${i+1}</td>`;
+                    } else if (field === 'quantity') {
+                        tableHTML += `<td>${Math.floor(Math.random() * 100)}</td>`;
+                    } else if (field === 'price') {
+                        tableHTML += `<td>$${(Math.random() * 100).toFixed(2)}</td>`;
+                    } else if (field === 'cost') {
+                        tableHTML += `<td>$${(Math.random() * 50).toFixed(2)}</td>`;
+                    } else if (field === 'profit_margin') {
+                        tableHTML += `<td>${(Math.random() * 50).toFixed(2)}%</td>`;
+                    } else if (field === 'status') {
+                        tableHTML += `<td>${i % 2 === 0 ? 'Active' : 'Inactive'}</td>`;
+                    }
+                });
+                tableHTML += '</tr>';
+            }
+            
+            tableHTML += '</tbody></table></div>';
+            previewDiv.innerHTML = tableHTML;
+        }
+        
+        // Initial preview update
+        updatePreview();
+    });
+</script>
+{% endblock %}

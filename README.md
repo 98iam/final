@@ -10,6 +10,9 @@ A Django-based inventory management system that helps track products, categories
 - Admin interface for easy management
 - Secure authentication system with Supabase integration
 - Multi-user support with data isolation
+- Dashboard analytics with interactive charts
+- Dark mode support for better visibility
+- Customizable reports
 
 ## Tech Stack
 
@@ -18,6 +21,7 @@ A Django-based inventory management system that helps track products, categories
 - PostgreSQL (Supabase)
 - Bootstrap 5.3
 - Font Awesome 6.0
+- Chart.js for data visualization
 
 ## Installation
 
@@ -63,6 +67,21 @@ python manage.py runserver
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## Analytics Features
+
+The system includes comprehensive analytics capabilities:
+
+- **Sales Trends**: Interactive charts showing sales over time (daily, weekly, monthly)
+- **Inventory Value Tracking**: Monitor how your inventory value changes over time
+- **Product Performance Metrics**: Identify your best and worst-selling products
+- **Customizable Reports**: Create and save custom reports for your specific needs
+
+## User Experience
+
+- **Dark Mode**: Toggle between light and dark themes for comfortable viewing in different environments
+- **Responsive Design**: Works well on desktop and mobile devices
+- **User-specific Data**: Each user sees only their own inventory and analytics data
 
 ## License
 
