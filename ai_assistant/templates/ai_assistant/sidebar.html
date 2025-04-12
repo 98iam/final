@@ -1,0 +1,38 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+
+<!-- AI Toggle Button -->
+<button id="aiToggleButton" class="ai-toggle-button" title="AI Assistant">
+    <i class="fas fa-robot"></i>
+</button>
+
+<!-- AI Sidebar -->
+<div id="aiSidebar" class="ai-sidebar">
+    <div class="ai-sidebar-header">
+        <h5 class="ai-sidebar-title">
+            <i class="fas fa-robot"></i> AI Assistant
+        </h5>
+        <button id="aiCloseButton" class="ai-sidebar-close" title="Close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="ai-sidebar-body">
+        <div id="aiMessages" class="ai-chat-messages">
+            <!-- Messages will be added here dynamically -->
+        </div>
+    </div>
+    
+    <div class="ai-sidebar-footer">
+        <form id="aiForm" class="ai-input-form">
+            {% csrf_token %}
+            <input type="text" id="aiInput" class="ai-input form-control" placeholder="Ask about your inventory...">
+            <button type="submit" id="aiSubmit" class="ai-submit">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script src="{% static 'js/sidebar.js' %}"></script>

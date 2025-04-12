@@ -130,5 +130,9 @@
     </script>
 
     {% block extra_js %}{% endblock %}
+
+    {% if user.is_authenticated %}
+        {% include 'ai_assistant/sidebar.html' %}
+    {% endif %}
 </body>
 </html>

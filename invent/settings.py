@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'products.apps.ProductsConfig',
-    'auth_app.apps.AuthAppConfig',  # Add auth app
+    'auth_app.apps.AuthAppConfig',  # Auth app
+    'ai_assistant',  # AI assistant app
 ]
 
 MIDDLEWARE = [

@@ -1,6 +1,6 @@
 # Inventory Management System
 
-A Django-based inventory management system that helps track products, categories, and stock levels.
+A Django-based inventory management system that helps track products, categories, and stock levels with advanced analytics, customizable dashboards, and AI-powered assistance.
 
 ## Features
 
@@ -15,6 +15,7 @@ A Django-based inventory management system that helps track products, categories
 - Customizable reports
 - Export functionality (CSV, Excel, PDF)
 - Dashboard widget customization
+- AI Assistant for natural language inventory queries
 
 ## Tech Stack
 
@@ -24,13 +25,14 @@ A Django-based inventory management system that helps track products, categories
 - Bootstrap 5.3
 - Font Awesome 6.0
 - Chart.js for data visualization
+- Google Gemini API for AI assistance
 
 ## Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
-cd YOUR_REPO
+git clone https://github.com/98iam/final.git
+cd final
 ```
 
 2. Create a virtual environment:
@@ -44,18 +46,23 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Run migrations:
+4. Create a `.env` file in the project root and add your API keys:
+```
+GOOGLE_GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+5. Run migrations:
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-5. Create a superuser:
+6. Create a superuser:
 ```bash
 python manage.py createsuperuser
 ```
 
-6. Run the development server:
+7. Run the development server:
 ```bash
 python manage.py runserver
 ```
@@ -90,6 +97,13 @@ The system includes comprehensive analytics capabilities:
 - **User Profile Management**: Update personal information, profile picture, and account preferences
 - **Notification Preferences**: Configure email notifications for low stock alerts and order updates
 - **Security Settings**: Change password and manage account security
+
+## AI Assistant
+
+- **Natural Language Queries**: Ask questions about your inventory in plain English
+- **Inventory Insights**: Get quick answers about stock levels, sales, and product information
+- **Accessible Interface**: Available from any page via a convenient sidebar
+- **Powered by Google Gemini**: Utilizes Google's advanced AI model for accurate responses
 
 ## License
 
