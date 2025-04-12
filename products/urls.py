@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from . import views_analytics
+from . import views_dashboard
 
 urlpatterns = [
     # Main views
@@ -19,4 +20,9 @@ urlpatterns = [
     path('analytics/custom-reports/', views_analytics.custom_reports, name='custom_reports'),
     path('save-report/', views_analytics.save_report, name='save_report'),
     path('save-theme-preference/', views_analytics.save_theme_preference, name='save_theme_preference'),
+
+    # Dashboard customization
+    path('dashboard/settings/', views_dashboard.dashboard_settings, name='dashboard_settings'),
+    path('dashboard/save-settings/', views_dashboard.save_dashboard_settings, name='save_dashboard_settings'),
+    path('dashboard/reset-settings/', views_dashboard.reset_dashboard_settings, name='reset_dashboard_settings'),
 ]

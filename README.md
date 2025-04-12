@@ -13,6 +13,8 @@ A Django-based inventory management system that helps track products, categories
 - Dashboard analytics with interactive charts
 - Dark mode support for better visibility
 - Customizable reports
+- Export functionality (CSV, Excel, PDF)
+- Dashboard widget customization
 
 ## Tech Stack
 
@@ -76,12 +78,15 @@ The system includes comprehensive analytics capabilities:
 - **Inventory Value Tracking**: Monitor how your inventory value changes over time
 - **Product Performance Metrics**: Identify your best and worst-selling products
 - **Customizable Reports**: Create and save custom reports for your specific needs
+- **Data Export**: Export data in various formats (CSV, Excel, PDF)
 
 ## User Experience
 
 - **Dark Mode**: Toggle between light and dark themes for comfortable viewing in different environments
 - **Responsive Design**: Works well on desktop and mobile devices
 - **User-specific Data**: Each user sees only their own inventory and analytics data
+- **Dashboard Customization**: Drag-and-drop interface to reorder and toggle dashboard widgets
+- **Personalized Settings**: User preferences are saved and applied across sessions
 
 ## License
 

@@ -4,8 +4,22 @@
 
 {% block content %}
 <div class="analytics-section">
-    <h2>Sales Trends</h2>
-    <p class="text-muted">Analyze your sales performance over time</p>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2>Sales Trends</h2>
+            <p class="text-muted mb-0">Analyze your sales performance over time</p>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-download"></i> Export Data
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                <li><a class="dropdown-item" href="{{ request.path }}?{% if days %}days={{ days }}&{% endif %}export=csv">CSV</a></li>
+                <li><a class="dropdown-item" href="{{ request.path }}?{% if days %}days={{ days }}&{% endif %}export=excel">Excel</a></li>
+                <li><a class="dropdown-item" href="{{ request.path }}?{% if days %}days={{ days }}&{% endif %}export=pdf">PDF</a></li>
+            </ul>
+        </div>
+    </div>
 
     <div class="row mb-4">
         <div class="col-md-8">
@@ -50,7 +64,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const salesData = {{ sales_data|safe }};
-        
+
         // Create sales chart
         const ctx = document.getElementById('salesChart').getContext('2d');
         const salesChart = new Chart(ctx, {

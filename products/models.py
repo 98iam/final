@@ -154,10 +154,51 @@ class UserPreference(models.Model):
         ('dark', 'Dark'),
     ]
 
+    # Default dashboard widgets and their order
+    DEFAULT_DASHBOARD_WIDGETS = {
+        'total_products': {'enabled': True, 'order': 1},
+        'total_categories': {'enabled': True, 'order': 2},
+        'low_stock_products': {'enabled': True, 'order': 3},
+        'total_value': {'enabled': True, 'order': 4},
+        'recent_products': {'enabled': True, 'order': 5},
+        'categories_with_counts': {'enabled': True, 'order': 6},
+    }
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='preferences')
     theme = models.CharField(max_length=10, choices=THEME_CHOICES, default='light')
+    dashboard_widgets = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.username}'s preferences"
+
+    def save(self, *args, **kwargs):
+        # Initialize dashboard_widgets with defaults if empty
+        if not self.dashboard_widgets:
+            self.dashboard_widgets = self.DEFAULT_DASHBOARD_WIDGETS
+        super().save(*args, **kwargs)
+
+    def get_widget_config(self, widget_name):
+        """Get configuration for a specific widget"""
+        if not self.dashboard_widgets:
+            return self.DEFAULT_DASHBOARD_WIDGETS.get(widget_name)
+        return self.dashboard_widgets.get(widget_name, self.DEFAULT_DASHBOARD_WIDGETS.get(widget_name))
+
+    def is_widget_enabled(self, widget_name):
+        """Check if a widget is enabled"""
+        widget_config = self.get_widget_config(widget_name)
+        if widget_config:
+            return widget_config.get('enabled', True)
+        return True  # Default to enabled if config not found
+
+    def get_ordered_widgets(self):
+        """Get widgets ordered by their order value"""
+        if not self.dashboard_widgets:
+            widgets = self.DEFAULT_DASHBOARD_WIDGETS
+        else:
+            widgets = self.dashboard_widgets
+
+        # Filter enabled widgets and sort by order
+        enabled_widgets = {k: v for k, v in widgets.items() if v.get('enabled', True)}
+        return sorted(enabled_widgets.items(), key=lambda x: x[1].get('order', 999))

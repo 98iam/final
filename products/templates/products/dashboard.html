@@ -3,88 +3,123 @@
 {% block title %}Dashboard - Inventory Management{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body">
-                <h5 class="card-title">Total Products</h5>
-                <h2>{{ total_products }}</h2>
-                <a href="{% url 'product_list' %}" class="text-white">View all products →</a>
+{% if show_customize_button %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Dashboard</h2>
+    <a href="{% url 'dashboard_settings' %}" class="btn btn-outline-primary">
+        <i class="fas fa-cog"></i> Customize Dashboard
+    </a>
+</div>
+{% endif %}
+
+<div class="row mb-4" id="dashboard-widgets">
+    {% for widget_id, config in ordered_widgets %}
+        {% if widget_id == 'total_products' and widget_data.total_products is not None %}
+            <div class="col-md-3 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
+                <div class="card bg-primary text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Products</h5>
+                        <h2>{{ widget_data.total_products }}</h2>
+                        <a href="{% url 'product_list' %}" class="text-white">View all products →</a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                <h5 class="card-title">Categories</h5>
-                <h2>{{ total_categories }}</h2>
-                <a href="{% url 'category_list' %}" class="text-white">View all categories →</a>
+        {% endif %}
+
+        {% if widget_id == 'total_categories' and widget_data.total_categories is not None %}
+            <div class="col-md-3 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Categories</h5>
+                        <h2>{{ widget_data.total_categories }}</h2>
+                        <a href="{% url 'category_list' %}" class="text-white">View all categories →</a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-warning text-white">
-            <div class="card-body">
-                <h5 class="card-title">Low Stock Items</h5>
-                <h2>{{ low_stock_products }}</h2>
-                <a href="{% url 'product_list' %}?low_stock=1" class="text-white">View low stock →</a>
+        {% endif %}
+
+        {% if widget_id == 'low_stock_products' and widget_data.low_stock_products is not None %}
+            <div class="col-md-3 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
+                <div class="card bg-warning text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Low Stock Items</h5>
+                        <h2>{{ widget_data.low_stock_products }}</h2>
+                        <a href="{% url 'product_list' %}?low_stock=1" class="text-white">View low stock →</a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-info text-white">
-            <div class="card-body">
-                <h5 class="card-title">Total Inventory Value</h5>
-                <h2>${{ total_value|floatformat:2 }}</h2>
+        {% endif %}
+
+        {% if widget_id == 'total_value' and widget_data.total_value is not None %}
+            <div class="col-md-3 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Inventory Value</h5>
+                        <h2>${{ widget_data.total_value|floatformat:2 }}</h2>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        {% endif %}
+    {% endfor %}
 </div>
 
 <div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Recent Products</h5>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    {% for product in recent_products %}
-                    <a href="{% url 'product_detail' product.pk %}" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ product.name }}</h6>
-                            <small>{{ product.created_at|date }}</small>
-                        </div>
-                        <p class="mb-1">Qty: {{ product.quantity }} | ${{ product.price }}</p>
-                    </a>
-                    {% empty %}
-                    <p class="text-muted">No products added yet.</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Categories Overview</h5>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    {% for category in categories_with_counts %}
-                    <div class="list-group-item">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ category.name }}</h6>
-                            <span class="badge bg-primary rounded-pill">{{ category.product_count }}</span>
+    {% for widget_id, config in ordered_widgets %}
+        {% if widget_id == 'recent_products' and widget_data.recent_products %}
+            <div class="col-md-6 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Recent Products</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for product in widget_data.recent_products %}
+                            <a href="{% url 'product_detail' product.pk %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ product.name }}</h6>
+                                    <small>{{ product.created_at|date }}</small>
+                                </div>
+                                <p class="mb-1">Qty: {{ product.quantity }} | ${{ product.price }}</p>
+                            </a>
+                            {% empty %}
+                            <p class="text-muted">No products added yet.</p>
+                            {% endfor %}
                         </div>
                     </div>
-                    {% empty %}
-                    <p class="text-muted">No categories added yet.</p>
-                    {% endfor %}
                 </div>
             </div>
-        </div>
-    </div>
+        {% endif %}
+
+        {% if widget_id == 'categories_with_counts' and widget_data.categories_with_counts %}
+            <div class="col-md-6 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Categories Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for category in widget_data.categories_with_counts %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ category.name }}</h6>
+                                    <span class="badge bg-primary rounded-pill">{{ category.product_count }}</span>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted">No categories added yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
 </div>
+
+{% if not ordered_widgets %}
+<div class="alert alert-info">
+    <h4 class="alert-heading">No widgets enabled!</h4>
+    <p>You have disabled all dashboard widgets. <a href="{% url 'dashboard_settings' %}" class="alert-link">Go to dashboard settings</a> to enable some widgets.</p>
+</div>
+{% endif %}
 {% endblock %}

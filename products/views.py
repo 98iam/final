@@ -2,29 +2,52 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Sum, Count, F, Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Product, Category
+from django.http import HttpResponse
+from .models import Product, Category, UserPreference
 from .forms import ProductForm, CategoryForm
+from .export import (
+    export_products_csv, export_products_excel, export_products_pdf,
+    export_categories_csv, export_categories_excel, export_categories_pdf
+)
 
 @login_required
 def dashboard(request):
-    # Filter products by the current user
-    total_products = Product.objects.filter(user=request.user).count()
-    total_categories = Category.objects.filter(user=request.user).count()
-    low_stock_products = Product.objects.filter(user=request.user, quantity__lte=F('minimum_stock')).count()
-    total_value = Product.objects.filter(user=request.user).aggregate(
-        total=Sum(F('quantity') * F('cost')))['total'] or 0
+    # Get user preferences for dashboard widgets
+    preference, created = UserPreference.objects.get_or_create(user=request.user)
 
-    recent_products = Product.objects.filter(user=request.user).order_by('-created_at')[:5]
-    categories_with_counts = Category.objects.filter(user=request.user).annotate(
-        product_count=Count('products')).order_by('-product_count')[:5]
+    # Prepare data for all widgets
+    widget_data = {}
+
+    # Only calculate data for enabled widgets
+    if preference.is_widget_enabled('total_products'):
+        widget_data['total_products'] = Product.objects.filter(user=request.user).count()
+
+    if preference.is_widget_enabled('total_categories'):
+        widget_data['total_categories'] = Category.objects.filter(user=request.user).count()
+
+    if preference.is_widget_enabled('low_stock_products'):
+        widget_data['low_stock_products'] = Product.objects.filter(
+            user=request.user, quantity__lte=F('minimum_stock')).count()
+
+    if preference.is_widget_enabled('total_value'):
+        widget_data['total_value'] = Product.objects.filter(user=request.user).aggregate(
+            total=Sum(F('quantity') * F('cost')))['total'] or 0
+
+    if preference.is_widget_enabled('recent_products'):
+        widget_data['recent_products'] = Product.objects.filter(
+            user=request.user).order_by('-created_at')[:5]
+
+    if preference.is_widget_enabled('categories_with_counts'):
+        widget_data['categories_with_counts'] = Category.objects.filter(user=request.user).annotate(
+            product_count=Count('products')).order_by('-product_count')[:5]
+
+    # Get ordered widgets for display
+    ordered_widgets = preference.get_ordered_widgets()
 
     context = {
-        'total_products': total_products,
-        'total_categories': total_categories,
-        'low_stock_products': low_stock_products,
-        'total_value': total_value,
-        'recent_products': recent_products,
-        'categories_with_counts': categories_with_counts,
+        'widget_data': widget_data,
+        'ordered_widgets': ordered_widgets,
+        'show_customize_button': True,
     }
     return render(request, 'products/dashboard.html', context)
 
@@ -58,6 +81,16 @@ def product_list(request):
         products = products.filter(quantity__lte=F('minimum_stock'))
 
     products = products.select_related('category').order_by('name')
+
+    # Handle export requests
+    export_format = request.GET.get('export')
+    if export_format:
+        if export_format == 'csv':
+            return export_products_csv(products)
+        elif export_format == 'excel':
+            return export_products_excel(products)
+        elif export_format == 'pdf':
+            return export_products_pdf(products)
 
     context = {
         'products': products,
@@ -115,6 +148,17 @@ def category_list(request):
     # Filter categories by the current user
     categories = Category.objects.filter(user=request.user).annotate(
         product_count=Count('products')).order_by('name')
+
+    # Handle export requests
+    export_format = request.GET.get('export')
+    if export_format:
+        if export_format == 'csv':
+            return export_categories_csv(categories)
+        elif export_format == 'excel':
+            return export_categories_excel(categories)
+        elif export_format == 'pdf':
+            return export_categories_pdf(categories)
+
     return render(request, 'products/category_list.html', {'categories': categories})
 
 @login_required
